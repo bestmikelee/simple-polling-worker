@@ -1,5 +1,24 @@
 onmessage = function(e) {
-  fetch("https://exchange.bitcoin/api/trades?since=5").then(res => {
-    postMessage(JSON.stringify(res.json(), null, 2));
-  });
+  var stopIntervalId = e.data;
+  if (stopIntervalId) {
+    clearInterval(stopIntervalId);
+  } else {
+    var interval = setInterval(() => {
+      fetch("https://blockchain.info/ticker", {
+        mode: "cors",
+        cache: "no-cache"
+      })
+        .then(res => {
+          console.log(res);
+          return res.json();
+        })
+        .then(data => {
+          var msg = {
+            intervalId: interval,
+            data: data
+          };
+          postMessage(msg);
+        });
+    }, 2000);
+  }
 };
